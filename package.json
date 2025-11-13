@@ -19,6 +19,7 @@
     "fs-extra": "^11.2.0",
     "jimp": "^0.16.13",
     "moment-timezone": "^0.5.45",
+    "request": "^2.88.2",
     "sahu-fca": "latest"
   }
 }
