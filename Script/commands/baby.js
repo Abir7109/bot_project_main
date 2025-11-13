@@ -1,6 +1,9 @@
 const axios = require("axios");
 const simsim = "https://simsimi.cyberbot.top";
 
+// Local cache for handleReply tracking
+const replyCache = new Map(); // messageID -> { author, type }
+
 module.exports.config = {
   name: "baby",
   version: "1.0.3",
@@ -30,13 +33,9 @@ module.exports.run = async function ({ api, event, args }) {
       const ran = ["Bolo baby", "hum"];
       const r = ran[Math.floor(Math.random() * ran.length)];
       return api.sendMessage(r, event.threadID, (err, info) => {
-        if (!err) {
-          global.client.handleReply.push({
-            name: module.exports.config.name,
-            messageID: info.messageID,
-            author: event.senderID,
-            type: "simsimi"
-          });
+        if (!err && info?.messageID) {
+          replyCache.set(info.messageID, { author: event.senderID, type: "simsimi" });
+          setTimeout(() => replyCache.delete(info.messageID), 300000); // 5 min timeout
         }
       });
     }
@@ -110,13 +109,9 @@ module.exports.run = async function ({ api, event, args }) {
     for (const reply of responses) {
       await new Promise((resolve) => {
         api.sendMessage(reply, event.threadID, (err, info) => {
-          if (!err) {
-            global.client.handleReply.push({
-              name: module.exports.config.name,
-              messageID: info.messageID,
-              author: event.senderID,
-              type: "simsimi"
-            });
+          if (!err && info?.messageID) {
+            replyCache.set(info.messageID, { author: event.senderID, type: "simsimi" });
+            setTimeout(() => replyCache.delete(info.messageID), 300000);
           }
           resolve();
         }, event.messageID);
@@ -128,8 +123,11 @@ module.exports.run = async function ({ api, event, args }) {
   }
 };
 
-module.exports.handleReply = async function ({ api, event, handleReply }) {
+module.exports.handleReply = async function ({ api, event }) {
   try {
+    const cachedData = replyCache.get(event.messageReply?.messageID);
+    if (!cachedData || cachedData.type !== 'simsimi') return;
+    
     let senderName = "Friend";
     try {
       const userInfo = await api.getUserInfo(event.senderID);
@@ -139,6 +137,8 @@ module.exports.handleReply = async function ({ api, event, handleReply }) {
     }
     const replyText = event.body ? event.body.toLowerCase() : "";
     if (!replyText) return;
+    
+    replyCache.delete(event.messageReply.messageID);
 
     const res = await axios.get(`${simsim}/simsimi?text=${encodeURIComponent(replyText)}&senderName=${encodeURIComponent(senderName)}`);
     const responses = Array.isArray(res.data.response) ? res.data.response : [res.data.response];
@@ -146,18 +146,13 @@ module.exports.handleReply = async function ({ api, event, handleReply }) {
     for (const reply of responses) {
       await new Promise((resolve) => {
         api.sendMessage(reply, event.threadID, (err, info) => {
-          if (!err) {
-            global.client.handleReply.push({
-              name: module.exports.config.name,
-              messageID: info.messageID,
-              author: event.senderID,
-              type: "simsimi"
-            });
+          if (!err && info?.messageID) {
+            replyCache.set(info.messageID, { author: event.senderID, type: "simsimi" });
+            setTimeout(() => replyCache.delete(info.messageID), 300000);
           }
           resolve();
         }, event.messageID);
-      }
-      );
+      });
     }
   } catch (err) {
     console.error(err);
@@ -256,13 +251,9 @@ module.exports.handleEvent = async function ({ api, event }) {
       };
 
       return api.sendMessage(mention, event.threadID, (err, info) => {
-        if (!err) {
-          global.client.handleReply.push({
-            name: module.exports.config.name,
-            messageID: info.messageID,
-            author: event.senderID,
-            type: "simsimi"
-          });
+        if (!err && info?.messageID) {
+          replyCache.set(info.messageID, { author: event.senderID, type: "simsimi" });
+          setTimeout(() => replyCache.delete(info.messageID), 300000);
         }
       }, event.messageID);
     }
@@ -283,13 +274,9 @@ module.exports.handleEvent = async function ({ api, event }) {
       for (const reply of responses) {
         await new Promise((resolve) => {
           api.sendMessage(reply, event.threadID, (err, info) => {
-            if (!err) {
-              global.client.handleReply.push({
-                name: module.exports.config.name,
-                messageID: info.messageID,
-                author: event.senderID,
-                type: "simsimi"
-              });
+            if (!err && info?.messageID) {
+              replyCache.set(info.messageID, { author: event.senderID, type: "simsimi" });
+              setTimeout(() => replyCache.delete(info.messageID), 300000);
             }
             resolve();
           }, event.messageID);
