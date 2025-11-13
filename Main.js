@@ -3,7 +3,8 @@ const path = require("path");
 const moment = require("moment-timezone");
 const login = require("sahu-fca");
 const logger = require("./utils/log");
-const chalk = require("chalk");
+const chalkNS = require("chalk");
+const chalk = chalkNS?.default || chalkNS;
 
 const cfgPath = path.join(__dirname, "config.json");
 const config = fs.readJsonSync(cfgPath);
@@ -90,7 +91,11 @@ function printBanner() {
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
   `;
-  console.log(chalk.cyan(banner));
+  if (chalk && typeof chalk.cyan === 'function') {
+    console.log(chalk.cyan(banner));
+  } else {
+    console.log(banner);
+  }
 }
 
 (async () => {
@@ -114,7 +119,7 @@ function printBanner() {
       autoReconnect: config.FCAOption?.autoReconnect ?? true
     });
 
-    const separator = chalk.gray("═".repeat(60));
+    const separator = (chalk && typeof chalk.gray === 'function') ? chalk.gray("═".repeat(60)) : "═".repeat(60);
     console.log(separator);
     logger(`${config.BOTNAME} is online. Loaded ${commands.size} commands and ${events.size} events.`, "[ online ]");
     logger(`Prefix: ${PREFIX} | Listening for messages...`, "[ info ]");
