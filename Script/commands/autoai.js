@@ -97,7 +97,7 @@ async function callAIWithProvider(messages) {
 }
 
 function getThreadConf(store, tid) {
-  const def = { enabled: false, mode: "smart", lang: "auto", cooldown: 20, contextOn: true, lastTs: 0, ctx: [] };
+  const def = { enabled: false, mode: "all", lang: "auto", cooldown: 20, contextOn: true, lastTs: 0, ctx: [] };
   const c = store.threads[tid] || def;
   // fill defaults
   return { ...def, ...c };
