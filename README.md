@@ -29,6 +29,7 @@ Service details:
 - Health check: `/healthz`
 
 ## Commands
+- `/help [command]` — show all commands or details about a specific command
 - `/admin` — show bot admin and owner information
 - `/ai <question>` — ask AI a question
 - `/autoai` — toggle automatic AI responses
