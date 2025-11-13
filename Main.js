@@ -156,6 +156,19 @@ function formatNow() {
         }
       } catch {}
 
+      // Check for reply to bot message (for interactive commands like help)
+      if (event.messageReply) {
+        for (const mod of commands.values()) {
+          if (typeof mod.handleReply === "function") {
+            try {
+              await mod.handleReply({ api, event, config, commands, logger });
+            } catch (e) {
+              logger(`handleReply error: ${e.message}`, "warn");
+            }
+          }
+        }
+      }
+
       if (!hasPrefix(body)) {
         // No prefix: dispatch handleEvent hooks (e.g., autoreply) if present
         for (const mod of commands.values()) {
