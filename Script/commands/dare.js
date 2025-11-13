@@ -22,13 +22,15 @@ const DARES = [
 ];
 
 module.exports.run = async function ({ api, event }) {
-  const path = __dirname + "/cache/dare.jpg";
+  const cachePath = __dirname + "/cache";
+  const imgPath = cachePath + "/dare.jpg";
+  fs.ensureDirSync(cachePath);
   try {
-    await require("request")(ABIR_IMG).pipe(fs.createWriteStream(path)).on("close", () => {
+    await require("request")(ABIR_IMG).pipe(fs.createWriteStream(imgPath)).on("close", () => {
       const body = `🔥 Dare: ${DARES[Math.floor(Math.random() * DARES.length)]}`;
-      api.sendMessage({ body, attachment: fs.createReadStream(path) }, event.threadID, () => fs.unlinkSync(path));
+      api.sendMessage({ body, attachment: fs.createReadStream(imgPath) }, event.threadID, () => fs.unlinkSync(imgPath), event.messageID);
     });
   } catch (e) {
-    api.sendMessage(`🔥 Dare: ${DARES[Math.floor(Math.random() * DARES.length)]}`, event.threadID);
+    api.sendMessage(`🔥 Dare: ${DARES[Math.floor(Math.random() * DARES.length)]}`, event.threadID, event.messageID);
   }
 };

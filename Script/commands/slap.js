@@ -13,7 +13,7 @@ credits: "ABIR",
 module.exports.run = async ({ api, event, args }) => {
 	const axios = require('axios');
 	const request = require('request');
-	const fs = require("fs");
+	const fs = require("fs-extra");
     var out = (msg) => api.sendMessage(msg, event.threadID, event.messageID);
   if (!args.join("")) return out("Please tag someone");
   else
@@ -23,19 +23,22 @@ module.exports.run = async ({ api, event, args }) => {
         var mention = Object.keys(event.mentions)[0];
                   let tag = event.mentions[mention].replace("@", "");    
         
+        const cachePath = __dirname + "/cache";
+        fs.ensureDirSync(cachePath);
+        
  let callback = function () {
-            api.setMessageReaction("ðŸ‘Š", event.messageID, (err) => {}, true);
+            api.setMessageReaction("👊", event.messageID, (err) => {}, true);
         api.sendMessage({
-						        body: "Slapped! " + tag + "\n\nà¦¬à§‡à¦¶à¦¿ à¦›à¦¾à¦¬à¦²à¦¾à¦®à¦¿ à¦•à¦°à¦²à§‡ à¦¥à¦¾à¦ªà§à¦ªà¦¡à¦¼ à¦®à§‡à¦°à§‡ à¦—à¦¾à¦² à¦²à¦¾à¦² à¦•à¦°à§‡ à¦¦à¦¿à¦¬ ðŸ˜¾",
+						        body: "Slapped! " + tag,
                                           mentions: [{
           tag: tag,
           id: Object.keys(event.mentions)[0]
         }],
-						attachment: fs.createReadStream(__dirname + `/cache/slap.${ext}`)
-					}, event.threadID, () => fs.unlinkSync(__dirname + `/cache/slap.${ext}`), event.messageID)
+						attachment: fs.createReadStream(cachePath + `/slap.${ext}`)
+					}, event.threadID, () => fs.unlinkSync(cachePath + `/slap.${ext}`), event.messageID)
 				};
  //   }
-        request(getURL).pipe(fs.createWriteStream(__dirname + `/cache/slap.${ext}`)).on("close", callback);
+        request(getURL).pipe(fs.createWriteStream(cachePath + `/slap.${ext}`)).on("close", callback);
 			})
     .catch(err => {
                      api.sendMessage("Failed to generate gif, be sure that you've tag someone!", event.threadID, event.messageID);

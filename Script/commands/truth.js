@@ -22,13 +22,15 @@ const PROMPTS = [
 ];
 
 module.exports.run = async function ({ api, event }) {
-  const path = __dirname + "/cache/truth.jpg";
+  const cachePath = __dirname + "/cache";
+  const imgPath = cachePath + "/truth.jpg";
+  fs.ensureDirSync(cachePath);
   try {
-    await require("request")(ABIR_IMG).pipe(fs.createWriteStream(path)).on("close", () => {
+    await require("request")(ABIR_IMG).pipe(fs.createWriteStream(imgPath)).on("close", () => {
       const body = `🧠 Truth: ${PROMPTS[Math.floor(Math.random() * PROMPTS.length)]}`;
-      api.sendMessage({ body, attachment: fs.createReadStream(path) }, event.threadID, () => fs.unlinkSync(path));
+      api.sendMessage({ body, attachment: fs.createReadStream(imgPath) }, event.threadID, () => fs.unlinkSync(imgPath), event.messageID);
     });
   } catch (e) {
-    api.sendMessage(`🧠 Truth: ${PROMPTS[Math.floor(Math.random() * PROMPTS.length)]}`, event.threadID);
+    api.sendMessage(`🧠 Truth: ${PROMPTS[Math.floor(Math.random() * PROMPTS.length)]}`, event.threadID, event.messageID);
   }
 };

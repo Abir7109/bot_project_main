@@ -1,76 +1,46 @@
-﻿const axios = require("axios");
+const axios = require("axios");
 const request = require("request");
 const fs = require("fs-extra");
 const moment = require("moment-timezone");
 
 module.exports.config = {
- name: "time",
- version: "1.0.1",
- hasPermssion: 0,
- credits: "ABIR"
- description: "Displays current time and bot runtime.",
- commandCategory: "Info",
- cooldowns: 1,
- dependencies: {
- "request": "",
- "fs-extra": "",
- "axios": ""
- }
+  name: "time",
+  version: "1.0.2",
+  hasPermssion: 0,
+  credits: "ABIR",
+  description: "Displays current time and bot runtime",
+  commandCategory: "Info",
+  cooldowns: 1
 };
 
 module.exports.run = async function({ api, event }) {
- const uptime = process.uptime(),
- hours = Math.floor(uptime / 3600),
- minutes = Math.floor((uptime % 3600) / 60),
- seconds = Math.floor(uptime % 60);
+  const uptime = process.uptime();
+  const hours = Math.floor(uptime / 3600);
+  const minutes = Math.floor((uptime % 3600) / 60);
+  const seconds = Math.floor(uptime % 60);
 
- const currentTime = moment.tz("Asia/Dhaka").format("ã€ŽD/MM/YYYYã€ ã€hh:mm:ssã€‘");
+  const currentTime = moment.tz("Asia/Dhaka").format("[D/MM/YYYY] [hh:mm:ss]");
 
- const imgLinks = [
- "https://i.imgur.com/EuiRi4v.jpeg",
- "https://i.imgur.com/ZjxQx17.jpeg",
- "https://i.imgur.com/dOO6Af5.jpeg",
- "https://i.imgur.com/WMIngcC.jpeg",
- "https://i.imgur.com/2dJSfXq.jpeg"
- ];
+  const imgLinks = [
+    "https://i.postimg.cc/rFnmYvCy/abir4.jpg",
+    "https://i.imgur.com/EuiRi4v.jpeg",
+    "https://i.imgur.com/ZjxQx17.jpeg"
+  ];
 
- const imgPath = __dirname + "/cache/time.jpg";
- const imgURL = imgLinks[Math.floor(Math.random() * imgLinks.length)];
+  const cachePath = __dirname + "/cache";
+  const imgPath = cachePath + "/time.jpg";
+  const imgURL = imgLinks[Math.floor(Math.random() * imgLinks.length)];
 
- const message = `ðŸŒ¸ ð—”ð˜€ð˜€ð—®ð—¹ð—®ð—ºð˜‚ ð—”ð—¹ð—®ð—¶ð—¸ð˜‚ð—º ðŸŒ¸
+  const message = `🌸 Assalamu Alaikum 🌸\n\n✨ Bot PREFIX: /\n\n📆 Current Time: ${currentTime}\n\n⏱️ Bot Uptime: ${hours} hour(s), ${minutes} minute(s), ${seconds} second(s)\n\n👤 BOT ADMIN: ABIR\n\n🌟 ABIR Chat Bot 🌟`;
 
-âœ¨ ð—•ð—¼ð˜ ð—£ð—¥ð—˜ð—™ð—œð—«: ${global.config.PREFIX}
+  fs.ensureDirSync(cachePath);
+  
+  const callback = () => {
+    api.sendMessage({
+      body: message,
+      attachment: fs.createReadStream(imgPath)
+    }, event.threadID, () => fs.unlinkSync(imgPath), event.messageID);
+  };
 
-ðŸ“† ð—–ð˜‚ð—¿ð—¿ð—²ð—»ð˜ ð—§ð—¶ð—ºð—²: ${currentTime}
-
-â±ï¸ ð—•ð—¼ð˜ ð—¨ð—½ð˜ð—¶ð—ºð—²: ${hours} hour(s), ${minutes} minute(s), ${seconds} second(s)
-
-ðŸ’ ð—•ð—¢ð—§ ð—”ð——ð— ð—œð—¡ ð—¦ð—”ð—›ð—”ð——ð—”ð—§~ð—¦ð—”ð—›ð—¨ðŸ’ 
-
-
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ”€â”€â”€â”€Â¶
-Â¶â”€â—¥â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ—¤â”€Â¶
-Â¶â”€â”€â—¥â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ—¤â”€â”€Â¶
-Â¶â”€â”€â”€â”€â—¥â–ˆâ–ˆâ–ˆâ–ˆâ—¤â”€â”€â”€â”€Â¶
-Â¶â”€â”€â”€â”€â”€â—¥â–ˆâ–ˆâ—¤â”€â”€â”€â”€â”€Â¶
-
-ðŸŒŸ â”€ê¯­â”€âƒâ€Œâ€Œð’ð¡ðšð¡ðšððšð­ ð‚ð¡ðšð­ ðð¨ð­ ðŸŒŸ`;
-
- const callback = () => {
- api.sendMessage({
- body: message,
- attachment: fs.createReadStream(imgPath)
- }, event.threadID, () => fs.unlinkSync(imgPath));
- };
-
- request(encodeURI(imgURL)).pipe(fs.createWriteStream(imgPath)).on("close", callback);
+  request(encodeURI(imgURL)).pipe(fs.createWriteStream(imgPath)).on("close", callback);
 };
