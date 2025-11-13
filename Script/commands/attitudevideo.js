@@ -27,6 +27,9 @@ module.exports.run = async ({ api, event }) => {
   
   const message = messages[Math.floor(Math.random() * messages.length)];
   
+  // Send initial message
+  api.sendMessage("⏳ Downloading attitude video...", event.threadID);
+  
   const links = [
     "https://drive.google.com/uc?id=11dUXILgge35GyV9ilD_JmzLiL7yq5WMc",
     "https://drive.google.com/uc?id=11Wr0yQ3QVG1BucbdlANkSo5vE-a___Sn",
@@ -106,28 +109,62 @@ module.exports.run = async ({ api, event }) => {
   const selectedLink = links[Math.floor(Math.random() * links.length)];
   const videoPath = path.join(cachePath, "attitude_video.mp4");
 
+  // Use timeout to prevent hanging
+  const timeout = setTimeout(() => {
+    api.sendMessage("⚠️ Download timeout. The video link may be unavailable. Please try again.", event.threadID, event.messageID);
+  }, 30000); // 30 second timeout
+
   try {
-    // Send downloading message
-    await api.sendMessage("⏳ Downloading attitude video...", event.threadID, event.messageID);
+    // Download the video with timeout
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        const writeStream = fs.createWriteStream(videoPath);
+        
+        request({
+          uri: encodeURI(selectedLink),
+          timeout: 25000,
+          followRedirect: true
+        })
+          .on('error', (err) => {
+            console.error('Request error:', err.message);
+            reject(err);
+          })
+          .on('response', (response) => {
+            if (response.statusCode !== 200) {
+              reject(new Error(`Bad status: ${response.statusCode}`));
+            }
+          })
+          .pipe(writeStream)
+          .on('finish', () => {
+            console.log('Download finished');
+            resolve();
+          })
+          .on('error', (err) => {
+            console.error('Write stream error:', err.message);
+            reject(err);
+          });
+      }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Download timeout')), 25000)
+      )
+    ]);
 
-    // Download the video
-    await new Promise((resolve, reject) => {
-      const writeStream = fs.createWriteStream(videoPath);
-      
-      request(encodeURI(selectedLink))
-        .on('error', reject)
-        .pipe(writeStream)
-        .on('finish', resolve)
-        .on('error', reject);
-    });
+    clearTimeout(timeout);
 
-    // Wait a bit to ensure file is fully written
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait for file to be fully written
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Check if file exists and has content
-    if (!fs.existsSync(videoPath) || fs.statSync(videoPath).size === 0) {
-      throw new Error('Downloaded file is empty or missing');
+    if (!fs.existsSync(videoPath)) {
+      throw new Error('Downloaded file is missing');
     }
+    
+    const fileSize = fs.statSync(videoPath).size;
+    if (fileSize === 0) {
+      throw new Error('Downloaded file is empty');
+    }
+
+    console.log(`Video downloaded successfully: ${fileSize} bytes`);
 
     // Send the video
     await api.sendMessage(
@@ -141,8 +178,19 @@ module.exports.run = async ({ api, event }) => {
       fs.unlinkSync(videoPath);
     }
   } catch (err) {
-    console.error("Error with attitude video:", err);
-    api.sendMessage("❌ Failed to download attitude video. Please try again.", event.threadID, event.messageID);
+    clearTimeout(timeout);
+    console.error("Error with attitude video:", err.message);
+    
+    // Send specific error message
+    let errorMsg = "❌ Failed to download attitude video.";
+    if (err.message.includes('timeout')) {
+      errorMsg += " Download timeout - the video link may be slow or unavailable.";
+    } else if (err.message.includes('Bad status')) {
+      errorMsg += " The video link returned an error.";
+    }
+    
+    api.sendMessage(errorMsg + " Please try again later.", event.threadID, event.messageID);
+    
     // Clean up on error
     if (fs.existsSync(videoPath)) {
       fs.unlinkSync(videoPath);
