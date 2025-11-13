@@ -1,0 +1,33 @@
+{
+  "Author": "Abir",
+  "version": "0.1.0",
+  "language": "en",
+  "DeveloperMode": false,
+  "BOTNAME": "Abir Chat Bot",
+  "PREFIX": "/",
+  "ADMINBOT": [
+    "61556527816380"
+  ],
+  "APPSTATEPATH": "appstate.json",
+  "OWNER": {
+    "name": "Abir",
+    "facebook": "https://www.facebook.com/ABIRMAHMMUD1344",
+    "whatsapp": "https://wa.me/8801919069898",
+    "photo": "https://i.postimg.cc/rFnmYvCy/abir4.jpg",
+    "birthday": "2026-04-14T00:00:00+06:00"
+  },
+  "FCAOption": {
+    "selfListen": false,
+    "listenEvents": true,
+    "listenTyping": false,
+    "updatePresence": false,
+    "forceLogin": false,
+    "autoMarkDelivery": false,
+    "autoMarkRead": false,
+    "autoReconnect": true,
+    "logRecordSize": 100,
+    "online": false,
+    "emitReady": false,
+    "userAgent": "Mozilla/5.0 (Linux; Android 16; SM-A356E Build/BP2A.250605.031.A3; wv) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+  }
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Abir Chat Bot</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background: #0f0c29; color: #f5f6fa; }
+    header { padding: 24px; background: rgba(15,12,41,.95); position: sticky; top: 0; }
+    main { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+    h1 { margin: 0 0 8px; font-size: 28px; background: linear-gradient(45deg, #6c5ce7,#fd79a8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 16px 20px; margin: 16px 0; }
+    .muted { opacity: .8; }
+    code { background: rgba(0,0,0,.3); padding: 2px 6px; border-radius: 6px; }
+    footer { text-align: center; opacity: .6; padding: 24px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Abir Chat Bot</h1>
+    <div class="muted">Unofficial Messenger account bot is running.</div>
+  </header>
+  <main>
+    <div class="card">
+      <h3>Health</h3>
+      <p>GET <code>/healthz</code> → ok</p>
+    </div>
+    <div class="card">
+      <h3>Commands</h3>
+      <p>In Messenger, use the prefix <code>/</code> by default.</p>
+      <ul>
+        <li><code>/help</code> — list commands or details for a command</li>
+        <li><code>/admin</code> — show Abir’s info</li>
+        <li><code>/ping</code> — latency check</li>
+        <li><code>/echo &lt;text&gt;</code> — echo message</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Setup</h3>
+      <ol>
+        <li>Put your Facebook <code>appstate.json</code> next to this file (path is configurable in <code>config.json</code>).</li>
+        <li>Update <code>config.json</code> OWNER links/photo and ADMINBOT UID.</li>
+        <li>Run <code>npm start</code>.</li>
+      </ol>
+    </div>
+  </main>
+  <footer>© Abir</footer>
+</body>
+</html>

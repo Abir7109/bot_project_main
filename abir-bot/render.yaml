@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: abir-bot
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm install --no-fund --no-audit
+    startCommand: npm start
+    autoDeploy: true
+    healthCheckPath: /healthz
