@@ -3,6 +3,7 @@ const path = require("path");
 const moment = require("moment-timezone");
 const login = require("sahu-fca");
 const logger = require("./utils/log");
+const chalk = require("chalk");
 
 const cfgPath = path.join(__dirname, "config.json");
 const config = fs.readJsonSync(cfgPath);
@@ -69,7 +70,32 @@ function formatNow() {
   return moment.tz("Asia/Dhaka").format("HH:mm:ss DD/MM/YYYY");
 }
 
+function printBanner() {
+  const banner = `
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║        █████╗ ██████╗ ██╗██████╗      ██████╗  ██████╗ ████████╗  ║
+║       ██╔══██╗██╔══██╗██║██╔══██╗    ██╔══██╗██╔═══██╗╚══██╔══╝  ║
+║       ███████║██████╔╝██║██████╔╝    ██████╔╝██║   ██║   ██║     ║
+║       ██╔══██║██╔══██╗██║██╔══██╗    ██╔══██╗██║   ██║   ██║     ║
+║       ██║  ██║██████╔╝██║██║  ██║    ██████╔╝╚██████╔╝   ██║     ║
+║       ╚═╝  ╚═╝╚═════╝ ╚═╝╚═╝  ╚═╝    ╚═════╝  ╚═════╝    ╚═╝     ║
+║                                                           ║
+║                  🤖 Facebook Messenger Bot 🤖              ║
+║                                                           ║
+║          Owner: ABIR                                      ║
+║          Version: 1.0.0                                   ║
+║          Facebook: fb.com/ABIRMAHMMUD1344                 ║
+║          WhatsApp: +8801919069898                         ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+  `;
+  console.log(chalk.cyan(banner));
+}
+
 (async () => {
+  printBanner();
+  
   const appState = loadAppState();
   const commands = loadCommands();
   const events = loadEvents();
@@ -88,7 +114,19 @@ function formatNow() {
       autoReconnect: config.FCAOption?.autoReconnect ?? true
     });
 
+    const separator = chalk.gray("═".repeat(60));
+    console.log(separator);
     logger(`${config.BOTNAME} is online. Loaded ${commands.size} commands and ${events.size} events.`, "[ online ]");
+    logger(`Prefix: ${PREFIX} | Listening for messages...`, "[ info ]");
+    console.log(separator);
+    
+    // Keep-alive mechanism - prevents bot from sleeping
+    setInterval(() => {
+      const uptime = Math.floor(process.uptime());
+      const hours = Math.floor(uptime / 3600);
+      const minutes = Math.floor((uptime % 3600) / 60);
+      logger(`Bot alive | Uptime: ${hours}h ${minutes}m`, "[ info ]");
+    }, 300000); // Every 5 minutes
 
     const cooldowns = new Map(); // Map<cmdName, Map<userId, ts>>
 
@@ -228,11 +266,12 @@ function formatNow() {
       }
 
       try {
+        logger(`User ${senderID.slice(0, 8)}... executed: /${name}`, "[ cmd ]");
         await cmd.run({ api, event, args, config, commands, logger, now: formatNow });
         map.set(senderID, nowTs);
         cooldowns.set(cmd.config.name, map);
       } catch (e) {
-        logger(`cmd ${name} error: ${e.message}`, "error");
+        logger(`Command ${name} error: ${e.message}`, "[ error ]");
         api.sendMessage(`Command error: ${e.message}`, threadID);
       }
     });
