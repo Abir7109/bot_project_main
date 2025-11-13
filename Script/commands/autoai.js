@@ -58,10 +58,12 @@ function shouldAnswer({ mode, body, botId, event }) {
   const mentionsBot = event.mentions && Object.keys(event.mentions).some(id => String(id) === String(botId));
   if (mode === "mention") return repliedToBot || mentionsBot;
 
-  // smart mode: question or addresses bot by name, or reply to bot
-  const looksQuestion = /\?|\b(how|why|what|kivabe|kemne|ki|kemon|কিভাবে|কেন|কি|কেমন)\b/i.test(text);
+  // smart mode: respond to questions, greetings, bot calls, or replies
+  const looksQuestion = /\?|\b(how|why|what|where|when|which|whose|whom|kivabe|kemne|ki|kemon|কিভাবে|কেন|কি|কেমন)\b/i.test(text);
+  const isGreeting = /\b(hi|hello|hey|sup|wassup|yo|kmn|kemon|aso|salam|assalam|hola|namaste|হ্যালো|সালাম)\b/i.test(text);
   const callsBot = /(abir|bot|বট|আবির)/i.test(text) || mentionsBot;
-  return repliedToBot || looksQuestion || callsBot;
+  const needsHelp = /\b(help|halp|helpp|plz|please|pls|bolo|bolona|bolo to|tell me|janao|janaben)\b/i.test(text);
+  return repliedToBot || looksQuestion || callsBot || isGreeting || needsHelp;
 }
 
 function buildSystemPrompt(lang, preferBn) {
