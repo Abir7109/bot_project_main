@@ -106,20 +106,46 @@ module.exports.run = async ({ api, event }) => {
   const selectedLink = links[Math.floor(Math.random() * links.length)];
   const videoPath = path.join(cachePath, "attitude_video.mp4");
 
-  const callback = () => {
-    api.sendMessage(
+  try {
+    // Send downloading message
+    await api.sendMessage("⏳ Downloading attitude video...", event.threadID, event.messageID);
+
+    // Download the video
+    await new Promise((resolve, reject) => {
+      const writeStream = fs.createWriteStream(videoPath);
+      
+      request(encodeURI(selectedLink))
+        .on('error', reject)
+        .pipe(writeStream)
+        .on('finish', resolve)
+        .on('error', reject);
+    });
+
+    // Wait a bit to ensure file is fully written
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Check if file exists and has content
+    if (!fs.existsSync(videoPath) || fs.statSync(videoPath).size === 0) {
+      throw new Error('Downloaded file is empty or missing');
+    }
+
+    // Send the video
+    await api.sendMessage(
       { body: `「 ${message} 」`, attachment: fs.createReadStream(videoPath) },
       event.threadID,
-      () => fs.unlinkSync(videoPath),
       event.messageID
     );
-  };
 
-  return request(encodeURI(selectedLink))
-    .pipe(fs.createWriteStream(videoPath))
-    .on("close", () => callback())
-    .on("error", (err) => {
-      console.error("Error downloading attitude video:", err);
-      api.sendMessage("❌ Failed to download attitude video. Please try again.", event.threadID, event.messageID);
-    });
+    // Clean up
+    if (fs.existsSync(videoPath)) {
+      fs.unlinkSync(videoPath);
+    }
+  } catch (err) {
+    console.error("Error with attitude video:", err);
+    api.sendMessage("❌ Failed to download attitude video. Please try again.", event.threadID, event.messageID);
+    // Clean up on error
+    if (fs.existsSync(videoPath)) {
+      fs.unlinkSync(videoPath);
+    }
+  }
 };
