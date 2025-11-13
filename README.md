@@ -29,10 +29,10 @@ Service details:
 - Health check: `/healthz`
 
 ## Commands
-- `/help` — list commands or details for one
-- `/admin` — show Abir owner info
-- `/ping` — latency check
-- `/echo <text>` — echo text
+- `/admin` — show bot admin and owner information
+- `/ai <question>` — ask AI a question
+- `/autoai` — toggle automatic AI responses
+- `/uid` — get your user ID
 
 ## Notes
 - If you keep `appstate.json` in the repo, keep the repository private to protect your session.

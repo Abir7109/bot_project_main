@@ -169,7 +169,8 @@ function formatNow() {
       const { name, args } = parse(body);
       const cmd = commands.get(name);
       if (!cmd) {
-        return api.sendMessage(`Unknown command. Available: ${PREFIX}admin, ${PREFIX}ai, ${PREFIX}autoai, ${PREFIX}uid, ${PREFIX}mealctl, ${PREFIX}meal, ${PREFIX}mealannounce`, threadID);
+        const availableCommands = Array.from(commands.keys()).map(c => `${PREFIX}${c}`).join(', ');
+        return api.sendMessage(`❌ Unknown command "${name}". Available commands: ${availableCommands}`, threadID);
       }
 
       // simple per-user cooldown
