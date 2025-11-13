@@ -27,7 +27,7 @@
 
 ---
 
-## Current Commands (17 Total)
+## Current Commands (19 Total)
 
 ### Core Commands
 1. **help** - Interactive numbered menu with photo, reply-to-run feature
@@ -37,20 +37,22 @@
 ### AI Commands
 4. **ai** - Ask AI questions (Groq-powered)
 5. **autoai** - Auto-reply AI in chat (mode: all/smart/mention)
+6. **baby** - Cute AI chatbot with teach/learn capabilities, SimSimi-powered
 
 ### Fun & Games
-6. **joke** - Random jokes with image
-7. **truth** - Truth game with points system (15 questions)
-8. **dare** - Dare game with points system (15 challenges)
-9. **time** - Current time & bot uptime
-10. **anime** - Random anime video clips (20 videos)
+7. **joke** - Random jokes with image
+8. **truth** - Truth game with points system (15 questions)
+9. **dare** - Dare game with points system (15 challenges)
+10. **time** - Current time & bot uptime
+11. **anime** - Random anime video clips (20 videos)
+12. **attitude** - Random attitude videos (74 videos from Google Drive)
 
 ### Social Interaction
-11. **hug** - Create hug image with avatars
-12. **slap** - Slap GIF with mentions
+13. **hug** - Create hug image with avatars
+14. **slap** - Slap GIF with mentions
 
 ### Utility
-13. **weather** - Weather info (wttr.in API)
+15. **weather** - Weather info (wttr.in API)
 
 ---
 
@@ -163,6 +165,24 @@
 - Fixed .gitignore to include cache assets
 - Environment variable setup for GROQ_API_KEY
 
+#### 11. Attitude Video Command (Nov 13, 2025)
+- Added attitudevideo.js command (74 Google Drive video URLs)
+- Random video selection with download progress
+- Proper cache directory handling with fs.ensureDirSync
+- Error handling for failed downloads
+- Auto-cleanup after sending
+- ABIR branding
+
+#### 12. Baby AI Chatbot Command (Nov 13, 2025)
+- Added baby.js SimSimi-powered AI chatbot
+- Features: teach, edit, remove, list capabilities
+- Auto-responds to "baby", "bot", "jan", "বট", "জান", etc.
+- handleReply support for continuous conversations
+- handleEvent for automatic trigger without prefix
+- 60+ Bangla greeting responses with mentions
+- Context-aware with user name integration
+- ABIR branding and Facebook links
+
 ---
 
 ## File Structure
@@ -191,6 +211,8 @@ bot project 1/
 │   │   ├── truth.js
 │   │   ├── dare.js
 │   │   ├── anime.js
+│   │   ├── attitudevideo.js
+│   │   ├── baby.js
 │   │   ├── ai.js
 │   │   ├── autoai.js
 │   │   ├── admin.js
