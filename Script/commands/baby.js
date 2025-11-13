@@ -13,10 +13,16 @@ module.exports.config = {
   prefix: false
 };
 
-module.exports.run = async function ({ api, event, args, Users }) {
+module.exports.run = async function ({ api, event, args }) {
   try {
     const uid = event.senderID;
-    const senderName = await Users.getNameUser(uid);
+    let senderName = "Friend";
+    try {
+      const userInfo = await api.getUserInfo(uid);
+      senderName = userInfo[uid]?.name || "Friend";
+    } catch (e) {
+      console.error("Error getting user name:", e);
+    }
     const rawQuery = args.join(" "); 
     const query = rawQuery.toLowerCase(); 
 
@@ -122,9 +128,15 @@ module.exports.run = async function ({ api, event, args, Users }) {
   }
 };
 
-module.exports.handleReply = async function ({ api, event, Users, handleReply }) {
+module.exports.handleReply = async function ({ api, event, handleReply }) {
   try {
-    const senderName = await Users.getNameUser(event.senderID);
+    let senderName = "Friend";
+    try {
+      const userInfo = await api.getUserInfo(event.senderID);
+      senderName = userInfo[event.senderID]?.name || "Friend";
+    } catch (e) {
+      console.error("Error getting user name:", e);
+    }
     const replyText = event.body ? event.body.toLowerCase() : "";
     if (!replyText) return;
 
@@ -153,12 +165,18 @@ module.exports.handleReply = async function ({ api, event, Users, handleReply })
   }
 };
 
-module.exports.handleEvent = async function ({ api, event, Users }) {
+module.exports.handleEvent = async function ({ api, event }) {
   try {
     const raw = event.body ? event.body.toLowerCase().trim() : "";
     if (!raw) return;
-    const senderName = await Users.getNameUser(event.senderID);
     const senderID = event.senderID;
+    let senderName = "Friend";
+    try {
+      const userInfo = await api.getUserInfo(senderID);
+      senderName = userInfo[senderID]?.name || "Friend";
+    } catch (e) {
+      console.error("Error getting user name:", e);
+    }
 
     if (
       raw === "baby" || raw === "bot" || raw === "bby" ||
