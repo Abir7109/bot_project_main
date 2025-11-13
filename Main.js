@@ -45,6 +45,26 @@ function loadCommands() {
   return commands;
 }
 
+function loadEvents() {
+  const dir = path.join(__dirname, "Script", "events");
+  const events = new Map();
+  if (!fs.existsSync(dir)) return events;
+  const files = fs.readdirSync(dir).filter(f => f.endsWith(".js"));
+  for (const f of files) {
+    try {
+      const evt = require(path.join(dir, f));
+      if (!evt || !evt.config || !evt.config.name || typeof evt.run !== "function") {
+        logger(`Skip invalid event file: ${f}`, "warn");
+        continue;
+      }
+      events.set(evt.config.name.toLowerCase(), evt);
+    } catch (e) {
+      logger(`Failed to load event ${f}: ${e.message}`, "error");
+    }
+  }
+  return events;
+}
+
 function formatNow() {
   return moment.tz("Asia/Dhaka").format("HH:mm:ss DD/MM/YYYY");
 }
@@ -52,6 +72,7 @@ function formatNow() {
 (async () => {
   const appState = loadAppState();
   const commands = loadCommands();
+  const events = loadEvents();
 
   login({ appState }, (err, api) => {
     if (err) {
@@ -67,7 +88,7 @@ function formatNow() {
       autoReconnect: config.FCAOption?.autoReconnect ?? true
     });
 
-    logger(`${config.BOTNAME} is online. Loaded ${commands.size} commands.`, "[ online ]");
+    logger(`${config.BOTNAME} is online. Loaded ${commands.size} commands and ${events.size} events.`, "[ online ]");
 
     const cooldowns = new Map(); // Map<cmdName, Map<userId, ts>>
 
@@ -111,8 +132,19 @@ function formatNow() {
       }
       if (!event) return;
 
-      // Dispatch non-message events to modules (e.g., antijoin)
+      // Dispatch non-message events to event handlers (e.g., joinNoti)
       if (event.type !== "message") {
+        // First check events folder
+        for (const evt of events.values()) {
+          if (evt.config.eventType && evt.config.eventType.includes(event.logMessageType)) {
+            try { 
+              await evt.run({ api, event, config, commands, logger }); 
+            } catch (e) {
+              logger(`Event ${evt.config.name} error: ${e.message}`, "error");
+            }
+          }
+        }
+        // Then check commands with handleEvent
         for (const mod of commands.values()) {
           if (typeof mod.handleEvent === "function") {
             try { await mod.handleEvent({ api, event, config, commands, logger }); } catch {}
