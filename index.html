@@ -3,47 +3,168 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Abir Chat Bot</title>
+  <title>ABIR Bot - Facebook Messenger Bot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background: #0f0c29; color: #f5f6fa; }
-    header { padding: 24px; background: rgba(15,12,41,.95); position: sticky; top: 0; }
-    main { max-width: 900px; margin: 32px auto; padding: 0 16px; }
-    h1 { margin: 0 0 8px; font-size: 28px; background: linear-gradient(45deg, #6c5ce7,#fd79a8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 16px 20px; margin: 16px 0; }
-    .muted { opacity: .8; }
-    code { background: rgba(0,0,0,.3); padding: 2px 6px; border-radius: 6px; }
-    footer { text-align: center; opacity: .6; padding: 24px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif; 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+    .particle { position: absolute; background: rgba(255,255,255,0.1); border-radius: 50%; animation: float 20s infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-100px) rotate(180deg); } }
+    
+    .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 20px; }
+    
+    header { text-align: center; padding: 60px 20px 40px; }
+    .logo { width: 120px; height: 120px; margin: 0 auto 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 48px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    
+    h1 { font-size: 48px; font-weight: 700; margin-bottom: 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .tagline { font-size: 20px; font-weight: 300; opacity: 0.9; margin-bottom: 30px; }
+    
+    .status { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+    .status-dot { width: 10px; height: 10px; background: #00ff88; border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin: 40px 0; }
+    
+    .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 32px; transition: all 0.3s ease; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 48px rgba(0,0,0,0.2); background: rgba(255,255,255,0.15); }
+    
+    .card-icon { font-size: 36px; margin-bottom: 16px; }
+    .card h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; }
+    .card p { font-size: 15px; line-height: 1.6; opacity: 0.9; margin-bottom: 12px; }
+    
+    .command-list { list-style: none; margin-top: 16px; }
+    .command-list li { background: rgba(0,0,0,0.2); padding: 12px 16px; border-radius: 10px; margin: 8px 0; font-family: 'Courier New', monospace; font-size: 14px; transition: background 0.2s; }
+    .command-list li:hover { background: rgba(0,0,0,0.3); }
+    
+    .stats { display: flex; justify-content: space-around; margin: 40px 0; }
+    .stat { text-align: center; }
+    .stat-number { font-size: 42px; font-weight: 700; display: block; margin-bottom: 8px; background: linear-gradient(45deg, #00ff88, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { font-size: 14px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
+    
+    .social-links { display: flex; gap: 16px; justify-content: center; margin: 40px 0; }
+    .social-btn { display: inline-flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); padding: 14px 28px; border-radius: 50px; text-decoration: none; color: #fff; font-weight: 500; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.2); }
+    .social-btn:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    
+    footer { text-align: center; padding: 40px 20px; opacity: 0.7; font-size: 14px; }
+    
+    @media (max-width: 768px) {
+      h1 { font-size: 36px; }
+      .grid { grid-template-columns: 1fr; }
+      .stats { flex-direction: column; gap: 24px; }
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Abir Chat Bot</h1>
-    <div class="muted">Unofficial Messenger account bot is running.</div>
-  </header>
-  <main>
-    <div class="card">
-      <h3>Health</h3>
-      <p>GET <code>/healthz</code> → ok</p>
+  <div class="particles">
+    <div class="particle" style="width: 60px; height: 60px; top: 10%; left: 10%; animation-duration: 15s;"></div>
+    <div class="particle" style="width: 40px; height: 40px; top: 60%; left: 80%; animation-duration: 18s;"></div>
+    <div class="particle" style="width: 80px; height: 80px; top: 80%; left: 20%; animation-duration: 22s;"></div>
+    <div class="particle" style="width: 50px; height: 50px; top: 30%; left: 70%; animation-duration: 20s;"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo">🤖</div>
+      <h1>ABIR BOT</h1>
+      <p class="tagline">Your Intelligent Facebook Messenger Companion</p>
+      <div class="status">
+        <span class="status-dot"></span>
+        Bot is Online & Ready
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-number">19+</span>
+        <span class="stat-label">Commands</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">24/7</span>
+        <span class="stat-label">Uptime</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">∞</span>
+        <span class="stat-label">Chats</span>
+      </div>
     </div>
-    <div class="card">
-      <h3>Commands</h3>
-      <p>In Messenger, use the prefix <code>/</code> by default.</p>
-      <ul>
-        <li><code>/help</code> — list commands or details for a command</li>
-        <li><code>/admin</code> — show Abir’s info</li>
-        <li><code>/ping</code> — latency check</li>
-        <li><code>/echo &lt;text&gt;</code> — echo message</li>
-      </ul>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">💬</div>
+        <h3>Chat Commands</h3>
+        <p>Interact with ABIR using simple commands in Messenger</p>
+        <ul class="command-list">
+          <li>/help - View all commands</li>
+          <li>/ai [question] - Ask AI anything</li>
+          <li>/baby [text] - SimSimi chatbot</li>
+          <li>/joke - Get random jokes</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🎮</div>
+        <h3>Fun & Games</h3>
+        <p>Play interactive games and earn points</p>
+        <ul class="command-list">
+          <li>/truth - Truth game with points</li>
+          <li>/dare - Dare challenges</li>
+          <li>/anime - Random anime videos</li>
+          <li>/attitude - Attitude videos</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🛠️</div>
+        <h3>Utility Tools</h3>
+        <p>Useful commands for everyday tasks</p>
+        <ul class="command-list">
+          <li>/weather [city] - Weather info</li>
+          <li>/time - Current time</li>
+          <li>/admin - Bot admin info</li>
+          <li>/uid - Get user ID</li>
+        </ul>
+      </div>
     </div>
-    <div class="card">
-      <h3>Setup</h3>
-      <ol>
-        <li>Put your Facebook <code>appstate.json</code> next to this file (path is configurable in <code>config.json</code>).</li>
-        <li>Update <code>config.json</code> OWNER links/photo and ADMINBOT UID.</li>
-        <li>Run <code>npm start</code>.</li>
-      </ol>
+
+    <div style="text-align: center; margin: 60px 0;">
+      <h2 style="font-size: 32px; margin-bottom: 24px;">Connect with ABIR</h2>
+      <div class="social-links">
+        <a href="https://m.me/ABIRMAHMMUD1344" class="social-btn" target="_blank">
+          <span>💬</span>
+          Message on Messenger
+        </a>
+        <a href="https://www.facebook.com/ABIRMAHMMUD1344" class="social-btn" target="_blank">
+          <span>📘</span>
+          Facebook Profile
+        </a>
+        <a href="https://wa.me/8801919069898" class="social-btn" target="_blank">
+          <span>📱</span>
+          WhatsApp
+        </a>
+      </div>
     </div>
-  </main>
-  <footer>© Abir</footer>
+
+    <div class="card" style="text-align: center;">
+      <div class="card-icon">⚡</div>
+      <h3>System Status</h3>
+      <p>Health Check: <code style="background: rgba(0,255,136,0.2); color: #00ff88; padding: 4px 12px; border-radius: 6px; font-weight: 600;">✓ ONLINE</code></p>
+      <p style="margin-top: 8px; font-size: 13px; opacity: 0.7;">Endpoint: GET /healthz → ok</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>Made with ❤️ by ABIR</p>
+    <p style="margin-top: 8px; font-size: 12px;">© 2025 ABIR Bot. All rights reserved.</p>
+  </footer>
 </body>
 </html>
