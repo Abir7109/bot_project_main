@@ -1,50 +1,39 @@
-# Bot Project 1
+# Abir Messenger Bot (Unofficial)
 
-A simple personal Discord bot with minimal commands and features.
+A minimal Facebook Messenger account bot scaffolded for Abir. It runs an Express server for uptime and a message listener using an unofficial API.
 
-## Features
+Important: This uses an unofficial chat API and logs in with a user session (appstate). Use at your own risk.
 
-- **Welcome Messages**: Automatically welcomes new members
-- **Basic Commands**:
-  - `!hello` - Bot greets you
-  - `!ping` - Check bot latency
-  - `!info` - Display bot information
-  - `!help` - Show all available commands (built-in)
+## Run locally
 
-## Setup
+1) Put your `appstate.json` file in the project root (same folder as `config.json`).
+2) Update `config.json` (ADMINBOT UID, OWNER links).
+3) Install and start:
 
-1. **Install Python** (3.8 or higher)
+```bash
+npm install
+npm start
+```
 
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+- Health endpoint: `GET /healthz` returns `ok`.
 
-3. **Create a Discord Bot**:
-   - Go to [Discord Developer Portal](https://discord.com/developers/applications)
-   - Create a new application
-   - Go to "Bot" section and create a bot
-   - Copy the bot token
+## Deploy on Render (file-based configuration)
 
-4. **Configure environment**:
-   - Copy `.env.example` to `.env`
-   - Replace `your_bot_token_here` with your actual bot token
+1) Push this folder to a private GitHub repository.
+2) Ensure your `appstate.json` is present in the repo (same folder as `config.json`).
+3) In Render, "New +" → "Blueprint" → Connect your repo, keep defaults.
+4) Deploy. Render will run `npm install` and `npm start`.
 
-5. **Run the bot**:
-   ```bash
-   python bot.py
-   ```
+Service details:
+- Type: Web Service (kept alive by Express in Abir.js)
+- Health check: `/healthz`
 
-## Future Features
-
-Add your planned features here as you expand the bot:
-- [ ] Moderation commands
-- [ ] Music playback
-- [ ] Custom reactions
-- [ ] Database integration
-- [ ] More interactive commands
+## Commands
+- `/help` — list commands or details for one
+- `/admin` — show Abir owner info
+- `/ping` — latency check
+- `/echo <text>` — echo text
 
 ## Notes
-
-- Bot prefix: `!`
-- Make sure to enable Message Content Intent in Discord Developer Portal
+- If you keep `appstate.json` in the repo, keep the repository private to protect your session.
+- Keep dependencies minimal and updated.
