@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { spawn } = require("child_process");
 const express = require("express");
 const path = require("path");
