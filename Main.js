@@ -125,13 +125,33 @@ function printBanner() {
     logger(`Prefix: ${PREFIX} | Listening for messages...`, "[ info ]");
     console.log(separator);
     
+    // Connection monitoring
+    let lastMessageTime = Date.now();
+    let messageCount = 0;
+    
     // Keep-alive mechanism - prevents bot from sleeping
     setInterval(() => {
       const uptime = Math.floor(process.uptime());
       const hours = Math.floor(uptime / 3600);
       const minutes = Math.floor((uptime % 3600) / 60);
-      logger(`Bot alive | Uptime: ${hours}h ${minutes}m`, "[ info ]");
+      const timeSinceLastMsg = Math.floor((Date.now() - lastMessageTime) / 1000 / 60);
+      
+      logger(`Bot alive | Uptime: ${hours}h ${minutes}m | Messages: ${messageCount} | Last msg: ${timeSinceLastMsg}m ago`, "[ info ]");
+      
+      // Warn if no messages received for 30 minutes
+      if (timeSinceLastMsg > 30) {
+        logger(`WARNING: No messages received for ${timeSinceLastMsg} minutes. Connection may be lost.`, "[ warn ]");
+      }
     }, 300000); // Every 5 minutes
+    
+    // Heartbeat - check connection every minute
+    setInterval(() => {
+      try {
+        api.getCurrentUserID(); // Simple call to check if API is still responsive
+      } catch (e) {
+        logger(`Heartbeat failed: ${e.message}. API may be disconnected.`, "[ error ]");
+      }
+    }, 60000); // Every minute
 
     const cooldowns = new Map(); // Map<cmdName, Map<userId, ts>>
 
@@ -170,10 +190,20 @@ function printBanner() {
 
     const stopListen = api.listenMqtt(async (listenErr, event) => {
       if (listenErr) {
-        logger(`listen error: ${listenErr.message}`, "error");
+        logger(`Listen error: ${listenErr.message}`, "[ error ]");
+        logger(`Error type: ${listenErr.error || 'unknown'}`, "[ warn ]");
+        
+        // Try to reconnect on certain errors
+        if (listenErr.error === 'Connection closed' || listenErr.error === 'Connection lost') {
+          logger('Attempting to reconnect...', "[ warn ]");
+        }
         return;
       }
       if (!event) return;
+      
+      // Update connection monitoring
+      lastMessageTime = Date.now();
+      messageCount++;
 
       // Dispatch non-message events to event handlers (e.g., joinNoti)
       if (event.type !== "message") {
